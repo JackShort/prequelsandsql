@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS -->
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+            integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+            crossorigin="anonymous"
+        />
+
+        <link href="styles.css" rel="stylesheet" type="text/css" />
+        <script src="jquery-3.4.1.min.js"></script>
+        <script src="mustache.js"></script>
+
+        <title>PrequelsAndSQL</title>
+    </head>
+    <body>
+        <div class="container" style="padding-top: 15px;">
+            <div class="row">
+                <div class="col-3">
+                    <h3>PrequelsAndSQL</h3>
+                </div>
+                <div class="col-9">
+                    <form action="" method="post" id="searchForm">
+                        <div class="form-group">
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                class="form-control"
+                                name="title"
+                            />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
+
+<script id="moviesTemplate" type="text/template">
+    <div class="row">
+        <div class="col-6">
+            {{tid}}
+        </div>
+        <div class="col-3">
+            {{title}}
+        </div>
+        <div class="col-3">
+            {{rating}}
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.ajax({
+            type: "POST",
+            url: "searchTitle.php",
+            data: $(this).serialize(),
+            success: function(response) {
+                var jsonData = JSON.parse(response);
+                for (var key in jsonData) {
+                    var template = $("#moviesTemplate").html();
+                    var html = Mustache.to_html(template, jsonData[key]);
+                    $(".container").append(html);
+                }
+            }
+        });
+    })
+
+    $(document).ready(function() {
+        $("#searchForm").submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "searchTitle.php",
+                data: $(this).serialize(),
+                success: function(response) {
+                    var jsonData = JSON.parse(response);
+                    for (var key in jsonData) {
+                        var template = $("#moviesTemplate").html();
+                        var html = Mustache.to_html(template, jsonData[key]);
+                        $(".container").append(html);
+                    }
+                }
+            });
+        });
+    });
+</script>
