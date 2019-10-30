@@ -1,0 +1,45 @@
+body {
+    background-color: #141414;
+    color: #e6e6e6 !important;
+}
+
+h1 {
+    color: white;
+}
+
+p {
+    color: white;
+}
+
+text {
+    color: white;
+}
+
+.searchBar {
+    background-color: transparent !important;
+    border-color: #595959;
+}
+
+.searchBar::placeholder {
+    color: #595959;
+}
+
+img.poster {
+    cursor: pointer;
+    height: 280px;
+}
+
+.posterContainer {
+    float: left;
+    margin-right: 20px;
+    width: 190px;
+}
+
+.title {
+    border: 1px solid lightslategrey;
+    margin: 20px auto 20px auto;
+    border-radius: 5px;
+    min-height: 360px;
+    padding: 10px;
+    border-color: #404040 !important;
+}

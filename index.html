@@ -16,7 +16,8 @@
             crossorigin="anonymous"
         />
 
-        <link href="styles.css" rel="stylesheet" type="text/css" />
+        <link href="styles1.css" rel="stylesheet" type="text/css" />
+        <script src="https://www.google.com/jsapi"></script>
         <script src="jquery-3.4.1.min.js"></script>
         <script src="mustache.js"></script>
 
@@ -33,18 +34,22 @@
                         <div class="form-group">
                             <input
                                 type="text"
-                                placeholder="Search"
-                                class="form-control"
+                                placeholder="Search..."
+                                class="form-control searchBar"
                                 name="title"
                             />
                         </div>
                     </form>
                 </div>
             </div>
+            <div class="container" id="sub-container">
+
+            </div>
         </div>
 
 
         <!-- Optional JavaScript -->
+        <!-- google key: AIzaSyDMAMJ-n-AEfXrMNEZ3hW_QkSRSK3zh-K4 -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
@@ -60,17 +65,40 @@
 </html>
 
 <script id="moviesTemplate" type="text/template">
-    <div class="row">
-        <div class="col-6">
+    <div class="row title">
+        <div class="col-4 poster-container">
+            <img src="{{{poster}}}" class="poster">
+        </div>
+        <div class="col-2">
             {{tid}}
         </div>
-        <div class="col-3">
+        <div class="col-4">
             {{title}}
         </div>
-        <div class="col-3">
+        <div class="col-2">
             {{rating}}
         </div>
     </div>
+</script>
+
+<script>
+    function loadTitle(jsonData, key) {
+        var newTitle = jsonData[key]["title"].split(" ").join("+")
+        var api = "https://api.themoviedb.org/3/search/movie?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
+        var query = api + newTitle;
+        jsonData[key]["poster"] = "https://image.tmdb.org/t/p/original/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg"
+        var imgLink = "https://image.tmdb.org/t/p/original/"
+
+        $.get( query, function( data ) {
+            if (data["total_results"] != 0) {
+                jsonData[key]["poster"] = imgLink + data["results"][0]["poster_path"];
+            }
+
+            var template = $("#moviesTemplate").html();
+            var html = Mustache.to_html(template, jsonData[key]);
+            $("#sub-container").append(html);
+        });
+    }
 </script>
 
 <script type="text/javascript">
@@ -82,9 +110,7 @@
             success: function(response) {
                 var jsonData = JSON.parse(response);
                 for (var key in jsonData) {
-                    var template = $("#moviesTemplate").html();
-                    var html = Mustache.to_html(template, jsonData[key]);
-                    $(".container").append(html);
+                    loadTitle(jsonData, key);
                 }
             }
         });
@@ -93,6 +119,7 @@
     $(document).ready(function() {
         $("#searchForm").submit(function(e) {
             e.preventDefault();
+            $("#sub-container").empty();
             $.ajax({
                 type: "POST",
                 url: "searchTitle.php",
@@ -100,9 +127,7 @@
                 success: function(response) {
                     var jsonData = JSON.parse(response);
                     for (var key in jsonData) {
-                        var template = $("#moviesTemplate").html();
-                        var html = Mustache.to_html(template, jsonData[key]);
-                        $(".container").append(html);
+                        loadTitle(jsonData, key);
                     }
                 }
             });
