@@ -66,19 +66,76 @@
 
 <script id="moviesTemplate" type="text/template">
     <div class="row title">
-        <div class="col-4 poster-container">
+        <div class="col-3 poster-container">
             <img src="{{{poster}}}" class="poster">
         </div>
-        <div class="col-2">
-            {{tid}}
-        </div>
-        <div class="col-4">
+        <div class="col-3">
             {{title}}
         </div>
-        <div class="col-2">
-            {{rating}}
+        <div class="col-3">
+            IMDb Rating:  {{rating}}
+        </div>
+        <div class="col-3">
+            Average User Rating:  {{user_rating}}
         </div>
     </div>
+    <div class="container" style="padding-top: 15px;">
+            <div class="row">
+                <div class="col-3">
+                    <form action="" method="post" id="searchForm">
+                        <div class="form-group">
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                class="form-control searchBar"
+                                name="title"
+                            />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="container" id="sub-container">
+
+            </div>
+        </div>
+        <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col-3">
+                        <form action="" method="post" id="searchForm">
+                            <div class="form-group">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    class="form-control searchBar"
+                                    name="username"
+                                />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="container" id="sub-container">
+    
+                </div>
+            </div>
+            <div class="container" style="padding-top: 15px;">
+                    <div class="row">
+                        <div class="col-3">
+                            <form action="" method="post" id="searchForm">
+                                <div class="form-group">
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        class="form-control searchBar"
+                                        name="rating"
+                                    />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="container" id="sub-container">
+        
+                    </div>
+                </div>
 </script>
 
 <script>
@@ -100,6 +157,7 @@
         });
     }
 </script>
+
 
 <script type="text/javascript">
     $(document).ready(function() {
