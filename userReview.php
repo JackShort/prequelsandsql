@@ -5,27 +5,22 @@
     $tid = $conn->real_escape_string($_POST['titleRating']);
 
     // Get movie information
-    $sql = "SELECT * FROM Title WHERE tid COLLATE UTF8_GENERAL_CI LIKE '%".$tid."%'";
-    $result = $conn->query($sql);
-    $data = array();
+    // $sql = "SELECT * FROM Title WHERE tid='$tid'";
+    // $result = $conn->query($sql);
+
+    // echo($result);
 
     $username = $conn->real_escape_string($_POST['username']);
     $rating = $conn->real_escape_string($_POST['rating']);
 
-    $sql2 = "INSERT INTO Rates VALUES ($tid, $username, $rating)";
-    $result2 = $conn->query($sql2);
+    $sql2 = "INSERT INTO Rates (tid, username, user_rating) VALUES (?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $sql2);
+    $stmt->bind_param("ssd", $tid, $username, $rating);
+    $stmt->execute();
+    printf("%d Row inserted.\n", $stmt->affected_rows);
+
+    /* close statement and connection */
+    $stmt->close();
     
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $arr = array();
-            $arr["tid"] = $row["tid"];
-            $arr["title"] = $row["title"];
-            $arr["rating"] = $row["rating"];
-            array_push($data, $arr);
-        }
-    }
-
-    echo json_encode($data);
-
     mysqli_close($conn);
 ?>
