@@ -43,3 +43,7 @@ img.poster {
     padding: 10px;
     border-color: #404040 !important;
 }
+
+.modal-content {
+    background-color: #141414;
+}
