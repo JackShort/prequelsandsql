@@ -12,12 +12,28 @@
 
     $username = $conn->real_escape_string($_POST['username']);
     $rating = $conn->real_escape_string($_POST['rating']);
+    $password = $conn->real_escape_string($_POST['password']);
 
-    $sql2 = "INSERT INTO Rates (tid, username, user_rating) VALUES (?, ?, ?)";
-    $stmt = mysqli_prepare($conn, $sql2);
-    $stmt->bind_param("ssd", $tid, $username, $rating);
+    $sql = "SELECT password FROM User WHERE username=?";
+    $stmt = mysqli_prepare($conn, $sql);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
-    printf("%d Row inserted.\n", $stmt->affected_rows);
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_row();
+        $hashedPassword = $row[0];
+        if (password_verify($password, $hashedPassword)) {
+            $sql2 = "INSERT INTO Rates (tid, username, user_rating) VALUES (?, ?, ?)";
+            $stmt = mysqli_prepare($conn, $sql2);
+            $stmt->bind_param("ssd", $tid, $username, $rating);
+            $stmt->execute();
+            printf("%d Row inserted.\n", $stmt->affected_rows);
+        }
+    } else {
+        echo "we didnd't make it ";
+    }
+
 
     /* close statement and connection */
     $stmt->close();

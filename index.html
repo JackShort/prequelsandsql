@@ -87,6 +87,10 @@
             <div class="container" id="sub-container">
 
             </div>
+
+            <div class="row btn-group d-flex">
+                <button type="button" class="btn btn-primary w-100" id="exportButton">Export Search Results (CSV)</button>
+            </div>
         </div>
 
 
@@ -103,6 +107,10 @@
             integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
             crossorigin="anonymous"
         ></script>
+
+        <script>
+            var lastSearch;
+        </script>
     </body>
 </html>
 
@@ -139,6 +147,10 @@
                             <div class="form-group">
                                 <label for="username" class="col-form-label">Username:</label>
                                 <input type="text" class="form-control" name="username" id="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="col-form-label">Password:</label>
+                                <input type="password" class="form-control" name="password" id="password">
                             </div>
                             <div class="form-group">
                                 <label for="rating" class="col-form-label">Rating: </label>
@@ -200,6 +212,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        lastSearch = $(this).serialize();
         $.ajax({
             type: "POST",
             url: "searchTitle.php",
@@ -217,6 +230,7 @@
         $("#searchForm").submit(function(e) {
             e.preventDefault();
             $("#sub-container").empty();
+            lastSearch = $(this).serialize();
             $.ajax({
                 type: "POST",
                 url: "searchTitle.php",
@@ -248,5 +262,28 @@
     $(document).on("click", "#ratingButton", function () {
         var titleId = $(this).data('id');
         $("#titleRating").val( titleId );
+    });
+
+    $(document).on("click", "#exportButton", function () {
+        $.ajax({
+            type: "POST",
+            url: "exportCSV.php",
+            data: lastSearch,
+            success: function(response) {
+                var filename = "searchResults.csv";
+
+                // The actual download
+                var blob = new Blob([response], { type: 'application/pdf' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+
+                document.body.appendChild(link);
+
+                link.click();
+
+                document.body.removeChild(link);
+            }
+        });
     });
 </script>

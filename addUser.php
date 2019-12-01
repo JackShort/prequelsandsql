@@ -4,6 +4,7 @@
     // update w/ button
     $username = $conn->real_escape_string($_POST['username']);
     $password = $conn->real_escape_string($_POST['password']);
+    $password = password_hash($password, PASSWORD_DEFAULT);
     $age = $conn->real_escape_string($_POST['age']);
     $genre = $conn->real_escape_string($_POST['genre']);
 
