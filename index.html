@@ -194,6 +194,9 @@
     function loadTitle(jsonData, key) {
         var newTitle = jsonData[key]["title"].split(" ").join("+")
         var api = "https://api.themoviedb.org/3/search/movie?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
+        if (jsonData[key]["tid"][0] == "t") {
+            api = "https://api.themoviedb.org/3/search/tv?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
+        }
         var query = api + newTitle;
         jsonData[key]["poster"] = "https://image.tmdb.org/t/p/original/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg"
         var imgLink = "https://image.tmdb.org/t/p/original/"
