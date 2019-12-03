@@ -24,11 +24,25 @@
         $row = $result->fetch_row();
         $hashedPassword = $row[0];
         if (password_verify($password, $hashedPassword)) {
-            $sql2 = "INSERT INTO Rates (tid, username, user_rating) VALUES (?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql2);
-            $stmt->bind_param("ssd", $tid, $username, $rating);
-            $stmt->execute();
-            printf("%d Row inserted.\n", $stmt->affected_rows);
+            $sql3 = "SELECT * FROM Rates WHERE username=? AND tid=?";
+            $stmt2 = mysqli_prepare($conn, $sql3);
+            $stmt2->bind_param("ss", $username, $tid);
+            $stmt2->execute();
+            $result2 = $stmt2->get_result();
+
+            if ($result2->num_rows > 0) {
+                $sql2 = "UPDATE Rates SET user_rating=? WHERE tid=? AND username=?";
+                $stmt = mysqli_prepare($conn, $sql2);
+                $stmt->bind_param("dss", $rating, $tid, $username);
+                $stmt->execute();
+                printf("%d Row inserted.\n", $stmt->affected_rows);
+            } else {
+                $sql2 = "INSERT INTO Rates (tid, username, user_rating) VALUES (?, ?, ?)";
+                $stmt = mysqli_prepare($conn, $sql2);
+                $stmt->bind_param("ssd", $tid, $username, $rating);
+                $stmt->execute();
+                printf("%d Row inserted.\n", $stmt->affected_rows);
+            }
         }
     } else {
         echo "we didnd't make it ";
