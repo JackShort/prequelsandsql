@@ -4,10 +4,33 @@
     $title = $conn->real_escape_string($_POST['title']);
     $netflix = $conn->real_escape_string($_POST['netflix']);
     $amazon = $conn->real_escape_string($_POST['amazon']);
+    $yearFrom = $conn->real_escape_string($_POST['yearFrom']);
+    $yearTo = $conn->real_escape_string($_POST['yearTo']);
 
+    $netflix = $netflix === 'true'? true: false;
+    $amazon = $amazon === 'true'? true: false;
+    
     //$sql = "SELECT Title.tid, Title.title, Title.rating, AVG(user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid GROUP BY Title.title WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
-    $sql = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%' GROUP BY Title.title";
-    $result = $conn->query($sql);
+    $sqlBase = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM ((Title LEFT JOIN Rates ON Title.tid=Rates.tid) LEFT JOIN Movie ON Title.tid=Movie.tid) WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
+
+    if ($netflix == TRUE) {
+        $sqlBase .= " AND Title.netflix = $netflix";
+    }
+
+    if ($amazon == TRUE) {
+        $sqlBase .= " AND Title.prime = $amazon";
+    }
+
+    if ($yearFrom) {
+        $sqlBase .= " AND Movie.release_year >= $yearFrom";
+    }
+
+    if ($yearTo) {
+        $sqlBase .= " AND Movie.release_year <= $yearTo";
+    }
+
+    $sqlBase .= " GROUP BY Title.title" ;
+    $result = $conn->query($sqlBase);
     $data = array();
 
     //$sql2 = "SELECT AVG(user_rating) as user_rating FROM $result";

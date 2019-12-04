@@ -17,7 +17,7 @@ text {
 
 .searchBar {
     background-color: transparent !important;
-    border-color: #595959;
+    border-color: #595959 !important;
 }
 
 .searchBar::placeholder {
@@ -46,4 +46,26 @@ img.poster {
 
 .modal-content {
     background-color: #141414;
+}
+
+.custom-control-label::before {
+    background-color: #141414;
+}
+
+.input-group-text {
+    background-color: #333333;
+    color: white;
+    border: #333;
+}
+
+.form-control {
+    background-color: #444;
+    border: #444;
+    color: white;
+}
+
+.form-control:focus {
+    background-color: #444;
+    border: #444;
+    color: white;
 }
