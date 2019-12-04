@@ -9,19 +9,20 @@
     $minRating = $conn->real_escape_string($_POST['minRating']);
     $maxRating = $conn->real_escape_string($_POST['maxRating']);
     $sort = $conn->real_escape_string($_POST['sort']);
+    $genres = $_POST['genres'];
 
     $netflix = $netflix === 'true'? true: false;
     $amazon = $amazon === 'true'? true: false;
     $sort = intval($sort);
     
     //$sql = "SELECT Title.tid, Title.title, Title.rating, AVG(user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid GROUP BY Title.title WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
-    $sqlBase = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM ((Title LEFT JOIN Rates ON Title.tid=Rates.tid) LEFT JOIN Movie ON Title.tid=Movie.tid) WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
+    $sqlBase = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM (((Title NATURAL JOIN Rates) NATURAL JOIN Movie) LEFT JOIN Movie_Genres ON Title.tid=Movie_Genres.tid) WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
 
-    if ($netflix == TRUE) {
+    if ($netflix == TRUE && $amazon == TRUE) {
+        $sqlBase .= " AND (Title.netflix = $netflix OR Title.amazon = $amazon)";
+    } else if ($netflix == TRUE) {
         $sqlBase .= " AND Title.netflix = $netflix";
-    }
-
-    if ($amazon == TRUE) {
+    } else if ($amazon == TRUE) {
         $sqlBase .= " AND Title.prime = $amazon";
     }
 
@@ -39,6 +40,28 @@
 
     if ($maxRating) {
         $sqlBase .= " AND Title.rating <= $maxRating";
+    }
+
+    if ($genres) {
+        $count = 0;
+        foreach ($genres as &$value) {
+            $count++;
+        }
+
+        if($count > 1) {
+            $sqlBase .= " AND (";
+            for ($i = 0; $i < count($genres) - 1; $i++) {
+                $genre = $genres[$i];
+                $sqlBase .= "Movie_Genres.genre = '$genre' OR ";
+            } 
+            
+            $genre = $genres[$count - 1];
+            $sqlBase .= "Movie_Genres.genre = '$genre'";
+            $sqlBase .= ")";
+        } else {
+            $genre = $genres[0];
+            $sqlBase .= " AND Movie_Genres.genre = '$genre'";
+        }
     }
 
     $sqlBase .= " GROUP BY Title.title" ;

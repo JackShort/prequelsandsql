@@ -98,4 +98,24 @@ img.poster {
     padding-right: 10px;
     padding-top: 5px;
     padding-bottom: 5px;
-    }
+}
+
+.btn-light {
+    background-color: #333333 !important;
+    color: white;
+    border: #333 !important;
+}
+
+.dropdown-menu {
+    background-color: #333333 !important;
+    color: white;
+    border: #333 !important;
+}
+
+.dropdown-item:focus, .dropdown-item:hover {
+    background-color: #555;
+}
+
+.btn-light:not(:disabled):not(.disabled).active, .btn-light:not(:disabled):not(.disabled):active, .show>.btn-light.dropdown-toggle {
+    color: white;
+}
