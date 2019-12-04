@@ -35,6 +35,207 @@
         <script>
             var lastSearch;
         </script>
+
+        <script id="moviesTemplate" type="text/template">
+            <div class="row title">
+                <div class="col-3 poster-container">
+                    <img src="{{{poster}}}" class="poster">
+                </div>
+                <div class="col-2">
+                    {{title}}
+                </div>
+                <div class="col-2">
+                    IMDb Rating:  {{rating}}
+                </div>
+                <div class="col-3">
+                    Average User Rating:  {{user_rating}}
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-id="{{{tid}}}" id="ratingButton" data-target="#rateModal">Rate</button>
+                </div>
+
+                <div class="modal fade" id="rateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="reviewModalLabel">Rate a Movie</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true"></span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="post" id="ratingForm">
+                                    <input type="hidden" id="titleRating" name="titleRating" value="">
+                                    <div class="form-group">
+                                        <label for="username" class="col-form-label">Username:</label>
+                                        <input type="text" class="form-control" name="username" id="username">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password" class="col-form-label">Password:</label>
+                                        <input type="password" class="form-control" name="password" id="password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="rating" class="col-form-label">Rating: </label>
+                                        <select class="form-control" name="rating" id="rating">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" id="rateSubmitButton" class="btn btn-primary">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $('#ratingForm').submit(function(e) {
+                        e.preventDefault();
+                        $("#rateModal").modal('toggle');
+
+                        $.ajax({
+                            type: "POST",
+                            url: "userReview.php",
+                            data: $(this).serialize(),
+                            success: function(response) {
+                                location.reload();
+                            }
+                        });
+                });
+            </script>
+        </script>
+
+        <script>
+            function loadTitle(jsonData, key) {
+                var newTitle = jsonData[key]["title"].split(" ").join("+")
+                var api = "https://api.themoviedb.org/3/search/movie?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
+                if (jsonData[key]["tid"][0] == "t") {
+                    api = "https://api.themoviedb.org/3/search/tv?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
+                }
+                var query = api + newTitle;
+                jsonData[key]["poster"] = "https://image.tmdb.org/t/p/original/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg"
+                var imgLink = "https://image.tmdb.org/t/p/original/"
+
+                $.get( query, function( data ) {
+                    if (data["total_results"] != 0) {
+                        jsonData[key]["poster"] = imgLink + data["results"][0]["poster_path"];
+                    }
+
+                    var template = $("#moviesTemplate").html();
+                    var html = Mustache.to_html(template, jsonData[key]);
+                    $("#sub-container").append(html);
+                });
+            }
+        </script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                lastSearch = $(this).serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "searchTitle.php",
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        var jsonData = JSON.parse(response);
+                        for (var key in jsonData) {
+                            loadTitle(jsonData, key);
+                        }
+                    }
+                });
+            })
+
+            function search() {
+                $("#sub-container").empty();
+                lastSearch = $("#searchForm").serialize();
+                var netflix = $('#netflixSwitch').prop("checked");
+                var amazon = $('#amazonSwitch').prop("checked");
+
+                var yearFrom = $('#yearFrom').val();
+                var yearTo = $('#yearTo').val();
+
+                var data = {};
+                data["netflix"] = netflix;
+                data["amazon"] = amazon;
+                data["yearFrom"] = yearFrom;
+                data["yearTo"] = yearTo;
+                lastSearch = lastSearch + '&' + $.param(data)
+                url = "searchTitleWithFilter.php"
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: lastSearch,
+                    success: function(response) {
+                        var jsonData = JSON.parse(response);
+                        for (var key in jsonData) {
+                            loadTitle(jsonData, key);
+                        }
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                $("#searchForm").submit(function(e) {
+                    e.preventDefault();
+                    search();
+                });
+            });
+
+            $(document).ready(function() {
+                $("#userForm").submit(function(e) {
+                    e.preventDefault();
+                    $.ajax({
+                        type: "POST",
+                        url: "addUser.php",
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            $("#userModal").modal('toggle');
+                        }
+                    });
+                });
+            });
+
+            $(document).on("click", "#ratingButton", function () {
+                var titleId = $(this).data('id');
+                $("#titleRating").val( titleId );
+            });
+
+            $(document).on("click", "#searchButton", function () {
+                console.log("here")
+                search();
+            });
+
+            $(document).on("click", "#exportButton", function () {
+                $.ajax({
+                    type: "POST",
+                    url: "exportCSV.php",
+                    data: lastSearch,
+                    success: function(response) {
+                        var filename = "searchResults.csv";
+
+                        // The actual download
+                        var blob = new Blob([response], { type: 'application/pdf' });
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = filename;
+
+                        document.body.appendChild(link);
+
+                        link.click();
+
+                        document.body.removeChild(link);
+                    }
+                });
+            });
+        </script>
+
     </head>
     <body>
         <div class="container" style="padding-top: 15px;">
@@ -124,6 +325,15 @@
                         <input type="text" class="form-control" aria-label="Default" name="yearTo" id="yearTo" aria-describedby="inputGroup-sizing-default">
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-4">
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn searchButton" id="searchButton">Search</button>
+                    </div>
+                    <div class="col-4">
+                    </div>
+                </div>
             </div>
 
             <div class="container" id="sub-container">
@@ -136,196 +346,3 @@
         </div>
     </body>
 </html>
-
-<script id="moviesTemplate" type="text/template">
-    <div class="row title">
-        <div class="col-3 poster-container">
-            <img src="{{{poster}}}" class="poster">
-        </div>
-        <div class="col-2">
-            {{title}}
-        </div>
-        <div class="col-2">
-            IMDb Rating:  {{rating}}
-        </div>
-        <div class="col-3">
-            Average User Rating:  {{user_rating}}
-        </div>
-        <div class="col-2">
-            <button type="button" class="btn btn-success" data-toggle="modal" data-id="{{{tid}}}" id="ratingButton" data-target="#rateModal">Rate</button>
-        </div>
-
-        <div class="modal fade" id="rateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="reviewModalLabel">Rate a Movie</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true"></span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="" method="post" id="ratingForm">
-                            <input type="hidden" id="titleRating" name="titleRating" value="">
-                            <div class="form-group">
-                                <label for="username" class="col-form-label">Username:</label>
-                                <input type="text" class="form-control" name="username" id="username">
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="col-form-label">Password:</label>
-                                <input type="password" class="form-control" name="password" id="password">
-                            </div>
-                            <div class="form-group">
-                                <label for="rating" class="col-form-label">Rating: </label>
-                                <select class="form-control" name="rating" id="rating">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" id="rateSubmitButton" class="btn btn-primary">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $('#ratingForm').submit(function(e) {
-                e.preventDefault();
-                $("#rateModal").modal('toggle');
-
-                $.ajax({
-                    type: "POST",
-                    url: "userReview.php",
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        location.reload();
-                    }
-                });
-        });
-    </script>
-</script>
-
-<script>
-    function loadTitle(jsonData, key) {
-        var newTitle = jsonData[key]["title"].split(" ").join("+")
-        var api = "https://api.themoviedb.org/3/search/movie?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
-        if (jsonData[key]["tid"][0] == "t") {
-            api = "https://api.themoviedb.org/3/search/tv?api_key=8b480b1904ac70cf1cde414f1524f9e9&query="
-        }
-        var query = api + newTitle;
-        jsonData[key]["poster"] = "https://image.tmdb.org/t/p/original/adw6Lq9FiC9zjYEpOqfq03ituwp.jpg"
-        var imgLink = "https://image.tmdb.org/t/p/original/"
-
-        $.get( query, function( data ) {
-            if (data["total_results"] != 0) {
-                jsonData[key]["poster"] = imgLink + data["results"][0]["poster_path"];
-            }
-
-            var template = $("#moviesTemplate").html();
-            var html = Mustache.to_html(template, jsonData[key]);
-            $("#sub-container").append(html);
-        });
-    }
-</script>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        lastSearch = $(this).serialize();
-        $.ajax({
-            type: "POST",
-            url: "searchTitle.php",
-            data: $(this).serialize(),
-            success: function(response) {
-                var jsonData = JSON.parse(response);
-                for (var key in jsonData) {
-                    loadTitle(jsonData, key);
-                }
-            }
-        });
-    })
-
-    $(document).ready(function() {
-        $("#searchForm").submit(function(e) {
-            e.preventDefault();
-            $("#sub-container").empty();
-            lastSearch = $(this).serialize();
-            var netflix = $('#netflixSwitch').prop("checked");
-            var amazon = $('#amazonSwitch').prop("checked");
-
-            var yearFrom = $('#yearFrom').val();
-            var yearTo = $('#yearTo').val();
-
-            var data = {};
-            data["netflix"] = netflix;
-            data["amazon"] = amazon;
-            data["yearFrom"] = yearFrom;
-            data["yearTo"] = yearTo;
-            lastSearch = lastSearch + '&' + $.param(data)
-            url = "searchTitleWithFilter.php"
-
-            console.log(lastSearch)
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: lastSearch,
-                success: function(response) {
-                    var jsonData = JSON.parse(response);
-                    for (var key in jsonData) {
-                        loadTitle(jsonData, key);
-                    }
-                }
-            });
-        });
-    });
-
-    $(document).ready(function() {
-        $("#userForm").submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                type: "POST",
-                url: "addUser.php",
-                data: $(this).serialize(),
-                success: function(response) {
-                    $("#userModal").modal('toggle');
-                }
-            });
-        });
-    });
-
-    $(document).on("click", "#ratingButton", function () {
-        var titleId = $(this).data('id');
-        $("#titleRating").val( titleId );
-    });
-
-    $(document).on("click", "#exportButton", function () {
-        $.ajax({
-            type: "POST",
-            url: "exportCSV.php",
-            data: lastSearch,
-            success: function(response) {
-                var filename = "searchResults.csv";
-
-                // The actual download
-                var blob = new Blob([response], { type: 'application/pdf' });
-                var link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-
-                document.body.appendChild(link);
-
-                link.click();
-
-                document.body.removeChild(link);
-            }
-        });
-    });
-</script>

@@ -69,3 +69,9 @@ img.poster {
     border: #444;
     color: white;
 }
+
+.searchButton {
+    background-color: #333333 !important;
+    color: white;
+    border: #333 !important;
+}
