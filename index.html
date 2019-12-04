@@ -156,15 +156,20 @@
                 lastSearch = $("#searchForm").serialize();
                 var netflix = $('#netflixSwitch').prop("checked");
                 var amazon = $('#amazonSwitch').prop("checked");
-
                 var yearFrom = $('#yearFrom').val();
                 var yearTo = $('#yearTo').val();
+                var minRating = $('#minRating').val();
+                var maxRating = $('#maxRating').val();
+                var sort = $('#sortSelect').val();
 
                 var data = {};
                 data["netflix"] = netflix;
                 data["amazon"] = amazon;
                 data["yearFrom"] = yearFrom;
                 data["yearTo"] = yearTo;
+                data["minRating"] = minRating;
+                data["maxRating"] = maxRating;
+                data["sort"] = sort;
                 lastSearch = lastSearch + '&' + $.param(data)
                 url = "searchTitleWithFilter.php"
 
@@ -208,7 +213,6 @@
             });
 
             $(document).on("click", "#searchButton", function () {
-                console.log("here")
                 search();
             });
 
@@ -299,7 +303,7 @@
                 </div>
             </div>
             <div class="filterContainer" style="padding-left:15px;">
-                <div class="row" style="padding-left:15px;">
+                <div class="row filter-row" style="padding-left:15px;">
                     <div class="custom-control custom-switch col-6">
                         <input type="checkbox" class="custom-control-input" name="netflixSwitch" id="netflixSwitch" value="1">
                         <label class="custom-control-label" for="netflixSwitch">Netflix</label>
@@ -309,7 +313,7 @@
                         <label class="custom-control-label" for="amazonSwitch">Amazon</label>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row filter-row">
                     <div class="input-group col-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Year From</span>
@@ -325,8 +329,31 @@
                         <input type="text" class="form-control" aria-label="Default" name="yearTo" id="yearTo" aria-describedby="inputGroup-sizing-default">
                     </div>
                 </div>
+                <div class="row filter-row">
+                    <div class="input-group col-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Min Rating</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default" name="minRating" id="minRating" aria-describedby="inputGroup-sizing-default">
+                    </div>
+                    <div class="input-group col-3">
+                    </div>
+                    <div class="input-group col-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Max Rating</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default" name="maxRating" id="maxRating" aria-describedby="inputGroup-sizing-default">
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-4">
+                        <label for="sortSelect">Sort By:</label>
+                        <select class="sort-custom-select" id="sortSelect">
+                            <option selected value="1">IMDb Rating</option>
+                            <option value="2">Average Rating</option>
+                            <option value="3">Alphabetical</option>
+                            <option value="4">Date Released</option>
+                        </select>
                     </div>
                     <div class="col-4">
                         <button type="button" class="btn searchButton" id="searchButton">Search</button>

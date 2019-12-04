@@ -6,7 +6,7 @@
     $amazon = $conn->real_escape_string($_POST['amazon']);
 
     //$sql = "SELECT Title.tid, Title.title, Title.rating, AVG(user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid GROUP BY Title.title WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
-    $sql = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%' GROUP BY Title.title";
+    $sql = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%' GROUP BY Title.title ORDER BY Title.rating DESC";
     $result = $conn->query($sql);
     $data = array();
 

@@ -6,9 +6,13 @@
     $amazon = $conn->real_escape_string($_POST['amazon']);
     $yearFrom = $conn->real_escape_string($_POST['yearFrom']);
     $yearTo = $conn->real_escape_string($_POST['yearTo']);
+    $minRating = $conn->real_escape_string($_POST['minRating']);
+    $maxRating = $conn->real_escape_string($_POST['maxRating']);
+    $sort = $conn->real_escape_string($_POST['sort']);
 
     $netflix = $netflix === 'true'? true: false;
     $amazon = $amazon === 'true'? true: false;
+    $sort = intval($sort);
     
     //$sql = "SELECT Title.tid, Title.title, Title.rating, AVG(user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid GROUP BY Title.title WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
     $sqlBase = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM ((Title LEFT JOIN Rates ON Title.tid=Rates.tid) LEFT JOIN Movie ON Title.tid=Movie.tid) WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
@@ -29,7 +33,31 @@
         $sqlBase .= " AND Movie.release_year <= $yearTo";
     }
 
+    if ($minRating) {
+        $sqlBase .= " AND Title.rating >= $minRating";
+    }
+
+    if ($maxRating) {
+        $sqlBase .= " AND Title.rating <= $maxRating";
+    }
+
     $sqlBase .= " GROUP BY Title.title" ;
+    
+    switch ($sort) {
+        case 1:
+            $sqlBase .= " ORDER BY Title.rating DESC";
+            break;
+        case 2:
+            $sqlBase .= " ORDER BY AVG(Rates.user_rating) DESC";
+            break;
+        case 3:
+            $sqlBase .= " ORDER BY Title.title ASC";
+            break;
+        case 4:
+            $sqlBase .= " ORDER BY Movie.release_year ASC";
+            break;
+    }
+
     $result = $conn->query($sqlBase);
     $data = array();
 

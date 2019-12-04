@@ -75,3 +75,27 @@ img.poster {
     color: white;
     border: #333 !important;
 }
+
+.filter-row {
+    padding-bottom: 15px;
+}
+
+.sort-custom-select {
+    display: inline-block;
+    width: auto;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    vertical-align: middle;
+    background: #333;
+    border: #333;
+    border-radius: .25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    }
