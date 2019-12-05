@@ -223,6 +223,36 @@
                 search();
             });
 
+            $(document).on("click", "#magicButton", function () {
+                $("#sub-container").empty();
+                lastSearch = $("#searchForm").serialize();
+                var netflix = $('#netflixSwitch').prop("checked");
+                var amazon = $('#amazonSwitch').prop("checked");
+                var yearFrom = $('#yearFrom').val();
+                var yearTo = $('#yearTo').val();
+                var minRating = $('#minRating').val();
+                var maxRating = $('#maxRating').val();
+                var sort = $('#sortSelect').val();
+                var genres = $('#genrePicker').val();
+
+                var data = {};
+                data["title"] = "Road House";
+                lastSearch = lastSearch + '&' + $.param(data)
+                url = "searchTitleWithFilter.php"
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: lastSearch,
+                    success: function(response) {
+                        var jsonData = JSON.parse(response);
+                        for (var key in jsonData) {
+                            loadTitle(jsonData, key);
+                        }
+                    }
+                });
+            });
+
             $(document).on("click", "#exportButton", function () {
                 $.ajax({
                     type: "POST",
@@ -384,6 +414,7 @@
                         <button type="button" class="btn searchButton" id="searchButton" style="width: 100%;%">Search</button>
                     </div>
                     <div class="col-4">
+                        <button type="button" class="btn searchButton" id="magicButton" style="width: 100%;%">I'm Feeling Lucky</button>
                     </div>
                 </div>
             </div>
