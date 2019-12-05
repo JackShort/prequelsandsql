@@ -1,6 +1,8 @@
 body {
     background-color: #141414;
     color: #e6e6e6 !important;
+    background-image: url("background.png");
+    background-repeat: repeat-y;
 }
 
 h1 {

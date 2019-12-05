@@ -16,10 +16,10 @@
     $sort = intval($sort);
     
     //$sql = "SELECT Title.tid, Title.title, Title.rating, AVG(user_rating) FROM Title LEFT JOIN Rates ON Title.tid=Rates.tid GROUP BY Title.title WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
-    $sqlBase = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM (((Title NATURAL JOIN Rates) NATURAL JOIN Movie) LEFT JOIN Movie_Genres ON Title.tid=Movie_Genres.tid) WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
+    $sqlBase = "SELECT Title.title, Title.tid, Title.rating, AVG(Rates.user_rating) FROM (((Title NATURAL JOIN Rates) NATURAL JOIN Movie) NATURAL JOIN Movie_Genres) WHERE title COLLATE UTF8_GENERAL_CI LIKE '%".$title."%'";
 
     if ($netflix == TRUE && $amazon == TRUE) {
-        $sqlBase .= " AND (Title.netflix = $netflix OR Title.amazon = $amazon)";
+        $sqlBase .= " AND (Title.netflix = $netflix OR Title.prime = $amazon)";
     } else if ($netflix == TRUE) {
         $sqlBase .= " AND Title.netflix = $netflix";
     } else if ($amazon == TRUE) {
